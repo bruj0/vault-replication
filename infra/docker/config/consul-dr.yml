@@ -1,0 +1,34 @@
+version: "3"
+networks:
+  vault_dr:
+    external: true
+
+services:
+  consul_agent_1: &consul-agent
+    networks:
+      - vault_dr
+
+  consul_agent_2:
+    networks:
+      - vault_dr
+
+  consul_agent_3:
+    networks:
+      - vault_dr
+
+  consul_server_1: &consul_server
+    networks:
+      - vault_dr
+
+  consul_server_2:
+    networks:
+      - vault_dr
+
+  consul_server_bootstrap:
+    networks:
+      - vault_dr
+    ports:
+      - "8403:8400"
+      - "8503:8500"
+      - "8603:8600"
+      - "8603:8600/udp"

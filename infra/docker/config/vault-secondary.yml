@@ -1,0 +1,23 @@
+version: "3"
+networks:
+  vault_secondary:
+    external: true
+
+  ## VAULT cluster configuration
+  vault01: &vault-server
+    networks:
+      - vault_secondary
+    ports:
+      - 9301:8200
+
+  vault02:
+    networks:
+      - vault_secondary
+    ports:
+      - 9302:8200
+
+  vault03:
+    networks:
+      - vault_secondary
+    ports:
+      - 9303:8200

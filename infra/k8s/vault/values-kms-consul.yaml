@@ -1,0 +1,52 @@
+global:
+  enabled: true
+
+injector:
+  enabled: true
+  image:
+    tag: "0.3.0"
+  agentImage:
+    tag: "1.3.4"
+
+  logLevel: "debug"
+  authPath: "auth/kubernetes"
+
+server:
+  image:
+    tag: "1.3.4"
+  extraEnvironmentVars:
+    GOOGLE_CREDENTIALS: /vault/userconfig/kms-creds/credentials.json
+    GOOGLE_APPLICATION_CREDENTIALS: /vault/userconfig/kms-creds/credentials.json
+
+  auditStorage:
+    enabled: true
+
+  extraVolumes:
+    - type: "secret"
+      name: "kms-creds"
+
+  ha:
+    enabled: true
+    replicas: 3
+
+    config: |
+      ui = true
+
+      listener "tcp" {
+        tls_disable = 1
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+      }
+
+      seal "gcpckms" {
+        project     = "rodrigo-support"
+        region      = "global"
+        key_ring    = "vault"
+        crypto_key  = "vault-unsealer"
+      }
+
+      storage "consul" {
+        path = "vault"
+        address = "HOST_IP:8500"
+      }
+      log_level = "Debug"

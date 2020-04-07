@@ -1,0 +1,10 @@
+.vagrant
+*~
+operations/data/dr/*.json
+operations/data/primary/*.json
+operations/data/secondary/*.json
+infra/docker/storage/consul/01
+infra/docker/storage/consul/02
+infra/docker/storage/consul/03
+image/vault
+old/

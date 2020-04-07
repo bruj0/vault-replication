@@ -1,0 +1,14 @@
+global:
+  image: "consul:1.7.1"
+
+server:
+  replicas: 3
+  bootstrapExpect: 3
+  storage: 100Gi
+  connect: true
+
+client:
+  grpc: true
+
+client:
+  enabled: true

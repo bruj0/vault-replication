@@ -1,0 +1,34 @@
+version: "3"
+services:
+  consul_agent_1: &consul_agent
+    image: consul:1.7.2
+    command: "agent -datacenter=${CONSUL_CLUSTER} -retry-join ${CONSUL_CLUSTER}_consul_server_bootstrap_1 -client 0.0.0.0"
+    volumes:
+      - ../storage/consul/config/:/consul/config
+
+  consul_agent_2:
+    <<: *consul_agent
+
+  consul_agent_3:
+    <<: *consul_agent
+
+  consul_server_1: &consul_server
+    <<: *consul_agent
+    command: "agent -server -datacenter=${CONSUL_CLUSTER} -retry-join ${CONSUL_CLUSTER}_consul_server_bootstrap_1 -client 0.0.0.0"
+    volumes:
+      - ../storage/consul/config/:/consul/config
+      - ../storage/consul/01:/consul/data
+
+  consul_server_2:
+    <<: *consul_server
+    volumes:
+      - ../storage/consul/config/:/consul/config
+      - ../storage/consul/02:/consul/data
+
+  consul_server_bootstrap:
+    <<: *consul_agent
+    image: consul:1.7.2
+    command: "agent -server -datacenter=${CONSUL_CLUSTER} -bootstrap-expect 3 -ui -client 0.0.0.0"
+    volumes:
+      - ../storage/consul/config/:/consul/config
+      - ../storage/consul/03:/consul/data

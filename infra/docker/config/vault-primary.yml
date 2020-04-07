@@ -1,0 +1,29 @@
+version: "3"
+networks:
+  vault_primary:
+    external: true
+  ## VAULT cluster configuration
+services:
+  vault01: &vault_server
+    volumes:
+      - ./primary:/vault/config
+    networks:
+      - vault_primary
+    ports:
+      - 9201:8200
+
+  vault02:
+    volumes:
+      - ./primary:/vault/config
+    networks:
+      - vault_primary
+    ports:
+      - 9202:8200
+
+  vault03:
+    volumes:
+      - ./primary:/vault/config
+    networks:
+      - vault_primary
+    ports:
+      - 9203:8200

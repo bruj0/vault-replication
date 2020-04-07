@@ -1,0 +1,18 @@
+version: "3"
+networks:
+  vault_primary:
+    external: true
+
+services:
+  # Prometheus stack configuration
+  prometheus: &prometheus
+    ports:
+      - 9204:9090
+    networks:
+      - vault_primary
+
+  grafana: &grafana
+    ports:
+      - 9205:3000
+    networks:
+      - vault_primary
