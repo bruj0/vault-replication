@@ -1,6 +1,9 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 # To enable debug: export DEBUG=true
-
+# Enable debug if the env variable DEBUG is set to true
+if [[ "$DEBUG" == "true" ]];then
+    set -x
+fi
 bold=$(tput bold)
 normal=$(tput sgr0)
 #Internal variables
@@ -12,6 +15,15 @@ export VAULT_DATA="./data/primary"
 export VAULT_TOKEN=$(cat $VAULT_DATA/init.json | jq -r '.root_token')
 
 case "$1" in
+"help")
+        echo "${bold}Usage: $0 <vault command>| <operation command>${normal}"
+        echo ""
+        echo "${bold}init${normal}"
+        echo "${bold}unseal${normal}"
+        echo "${bold}enable_replication${normal}"
+        echo "${bold}vars${normal}: show Vault env vars"
+        echo "${bold}yapi${normal}: runs yapi with correct variables"
+;;
 "enable_replication")
         set +e
         export SECONDARY_HAPROXY_ADDR=$(docker network inspect vault_secondary | jq -r '.[] .Containers | with_entries(select(.value.Name=="haproxy"))| .[] .IPv4Address' | awk -F "/" '{print $1}')

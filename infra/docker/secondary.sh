@@ -1,6 +1,9 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 # To enable debug: export DEBUG=true
-
+# Enable debug if the env variable DEBUG is set to true
+if [[ "$DEBUG" == "true" ]];then
+    set -x
+fi
 VAULT_VERSION="1.3.4"
 COMPOSE_CMD="docker-compose --project-directory ./config --project-name secondary -f config/vault-secondary.yml -f config/vault.yml"
 bold=$(tput bold)
