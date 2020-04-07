@@ -29,30 +29,6 @@ case "$2" in
         fi    
         ${COMPOSE_CMD} up -d ${RECREATE}
     ;;
-    "cli")
-# Cli command
-# $2 vault or consul or show
-# $3 command
-        export VAULT_TOKEN=$(cat ${VAULT_DATA}/init.json | jq -r '.root_token')
-        case "$2" in
-            "vault")
-                vault ${@:3}
-                ;;
-            "yapi")
-                 yapi ${@:3}
-                ;;
-            "vars")
-                set +x
-                echo "Exporting variables for ${CLUSTER}"
-                echo "export VAULT_ADDR=\"${VAULT_ADDR}\""
-                echo "export VAULT_DATA=\"${VAULT_DATA}\""
-                echo "export VAULT_TOKEN=\"${VAULT_TOKEN}\""
-                ;;
-            *)
-            echo "Cli not implemented: $2"
-            exit 1   
-            esac
-    ;;    
      *)
         echo "${bold}Usage: $0 <primary|secondary|dr> [command] [subcommand]${normal}"
         echo "Commands:"
