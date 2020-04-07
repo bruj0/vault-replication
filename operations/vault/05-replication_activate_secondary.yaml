@@ -6,12 +6,12 @@ stages:
       url: "{env_vars.VAULT_ADDR}/v1/sys/replication/performance/secondary/enable"
       method: POST
       headers:
-        X-Vault-Token: "{env_vars.VAULT_TOKEN}"      
+        X-Vault-Token: "{env_vars.VAULT_TOKEN}"
       json:
         $ext:
           function: extensions.read_json
           extra_kwargs:
-            path: "{env_vars.VAULT_DATA}/secondary-token.json"
+            path: "{env_vars.VAULT_DATA_PRIMARY}/secondary-token.json"
             sub_vars: True
         token: "ext.wrap_info.token"
         primary_api_addr: "http://{env_vars.SECONDARY_HAPROXY_ADDR}:8200"

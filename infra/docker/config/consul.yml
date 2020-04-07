@@ -17,13 +17,13 @@ services:
     command: "agent -server -datacenter=${CONSUL_CLUSTER} -retry-join ${CONSUL_CLUSTER}_consul_server_bootstrap_1 -client 0.0.0.0"
     volumes:
       - ../storage/consul/config/:/consul/config
-      - ../storage/consul/01:/consul/data
+      - ../storage/consul/${CONSUL_CLUSTER}/01:/consul/data
 
   consul_server_2:
     <<: *consul_server
     volumes:
       - ../storage/consul/config/:/consul/config
-      - ../storage/consul/02:/consul/data
+      - ../storage/consul/${CONSUL_CLUSTER}/02:/consul/data
 
   consul_server_bootstrap:
     <<: *consul_agent
@@ -31,4 +31,4 @@ services:
     command: "agent -server -datacenter=${CONSUL_CLUSTER} -bootstrap-expect 3 -ui -client 0.0.0.0"
     volumes:
       - ../storage/consul/config/:/consul/config
-      - ../storage/consul/03:/consul/data
+      - ../storage/consul/${CONSUL_CLUSTER}/03:/consul/data

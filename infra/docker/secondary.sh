@@ -13,7 +13,9 @@ typeset -a VAULT_dr_PORTS=("9401" "9402" "9403")
 export VAULT_ADDR=http://127.0.0.1:9201
 
 case "$1" in
-
+    "down")
+        ${COMPOSE_CMD} down
+    ;;
     "config")
         ${COMPOSE_CMD} config
     ;;

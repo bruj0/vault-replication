@@ -3,8 +3,8 @@
 operations/data/dr/*.json
 operations/data/primary/*.json
 operations/data/secondary/*.json
-infra/docker/storage/consul/01
-infra/docker/storage/consul/02
-infra/docker/storage/consul/03
+infra/docker/storage/consul/primary
+infra/docker/storage/consul/secondary
+infra/docker/storage/consul/dr
 infra/docker/image/vault
 old/
