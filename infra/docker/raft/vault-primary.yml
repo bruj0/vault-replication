@@ -1,25 +1,31 @@
 version: "3"
-  ## VAULT cluster configuration
+## VAULT cluster configuration
 services:
-  vault_unsealer: 
+  vault_unsealer:
     volumes:
       - ./primary:/vault/config
-      - ./../storage/raft/${VAULT_CLUSTER}/unsealer:/vault/raft  
+      - ./../storage/raft/${VAULT_CLUSTER}/unsealer:/vault/raft
     ports:
       - 9300:8200
-  vault01: 
+  vault01:
+    environment:
+      - VAULT_TOKEN=autounseal
     volumes:
       - ./primary:/vault/config
-      - ./../storage/raft/${VAULT_CLUSTER}/01:/vault/raft  
+      - ./../storage/raft/${VAULT_CLUSTER}/01:/vault/raft
     ports:
       - 9301:8200
   vault02:
+    environment:
+      - VAULT_TOKEN=autounseal
     volumes:
       - ./primary:/vault/config
-      - ./../storage/raft/${VAULT_CLUSTER}/02:/vault/raft  
+      - ./../storage/raft/${VAULT_CLUSTER}/02:/vault/raft
     ports:
       - 9302:8200
   vault03:
+    environment:
+      - VAULT_TOKEN=autounseal
     volumes:
       - ./primary:/vault/config
       - ./../storage/raft/${VAULT_CLUSTER}/03:/vault/raft

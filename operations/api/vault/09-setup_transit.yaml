@@ -1,0 +1,45 @@
+test_name: Setup the transit secret engine for auto-unseal
+stages:
+  - name: Create policy for autounseal
+    request:
+      url: "{env_vars.VAULT_ADDR}/v1/sys/policies/acl/autounseal"
+      method: PUT
+      headers:
+        X-Vault-Token: "{env_vars.VAULT_TOKEN}"
+        X-Vault-Request: "true"
+      json:
+        name: autounseal
+        policy: "path \"transit\/encrypt\/autounseal\" {\r\n   capabilities = [ \"update\" ]\r\n}\r\n\r\npath \"transit\/decrypt\/autounseal\" {\r\n   capabilities = [ \"update\" ]\r\n}"
+    response:
+      status_code: 204
+  - name: Create token named autounseal
+    request:
+      url: "{env_vars.VAULT_ADDR}/v1/auth/token/create"
+      method: POST
+      headers:
+        X-Vault-Token: "{env_vars.VAULT_TOKEN}"
+        X-Vault-Request: "true"
+      json:
+        id: autounseal
+        policies:
+          - autounseal
+        ttl: 0s
+        explicit_max_ttl: 0s
+        period: 0s
+        display_name: ""
+        num_uses: 0
+        renewable: true
+        type: service
+        entity_alias: ""
+    response:
+      status_code: 200
+  - name: Create transit key autounseal
+    request:
+      url: "{env_vars.VAULT_ADDR}/v1/transit/keys/autounseal"
+      method: POST
+      headers:
+        X-Vault-Token: "{env_vars.VAULT_TOKEN}"
+        X-Vault-Request: "true"
+      json:
+    response:
+      status_code: 204

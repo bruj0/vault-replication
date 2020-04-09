@@ -1,0 +1,23 @@
+test_name: Enable secret transit
+stages:
+  - name: Enable secret transit
+    request:
+      url: "{env_vars.VAULT_ADDR}/v1/sys/mounts/transit"
+      method: POST
+      headers:
+        X-Vault-Token: "{env_vars.VAULT_TOKEN}"
+        X-Vault-Request: "true"
+      json:
+        type: transit
+        description: ''
+        config:
+          options: 
+          default_lease_ttl: 0s
+          max_lease_ttl: 0s
+          force_no_cache: false
+        local: false
+        seal_wrap: false
+        external_entropy_access: false
+        options: 
+    response:
+      status_code: 204

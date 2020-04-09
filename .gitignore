@@ -5,4 +5,7 @@ infra/docker/storage/consul/primary
 infra/docker/storage/consul/secondary
 infra/docker/storage/consul/dr
 infra/docker/image/vault
+operations/raft/primary/
+operations/raft/secondary/
+operations/raft/dr/
 old/

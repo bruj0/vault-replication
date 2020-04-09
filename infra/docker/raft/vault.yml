@@ -12,7 +12,7 @@ services:
     networks:
       - vault_primaryA
       - vault_primaryB
-      - vault_primaryC    
+      - vault_primaryC
     environment:
       #- VAULT_CLUSTER_INTERFACE=eth0
       - VAULT_REDIRECT_INTERFACE=eth0

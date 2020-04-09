@@ -3,21 +3,22 @@ storage "raft" {
   node_id = "vault01"
 }
 listener "tcp" {
-  address = "0.0.0.0:8200"
-  cluster_address = "0.0.0.0:8201"
+  address = "primary_vault01_1:8200"
+  cluster_address = "primary_vault01_1:8201"
   tls_disable = true
 }
 seal "transit" {
-  address            = "http://0.0.0.0:8200"
+  address            = "http://primary_vault_unsealer_1:8200"
   # token is read from VAULT_TOKEN env
-  # token              = ""
-  disable_renewal    = "false"
+  #token              = "autounseal"
+  disable_renewal    = ""
+  //empty=false
   // Key configuration
-  key_name           = "unseal_key"
+  key_name           = "autounseal"
   mount_path         = "transit/"
 }
 ui = "true"
-cluster_addr = "http://0.0.0.0:8201"
+cluster_addr = "http://primary_vault01_1:8201"
 cluster_name = "Primary"
 telemetry {
   prometheus_retention_time = "30s"

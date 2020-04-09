@@ -14,19 +14,33 @@ typeset -a VAULT_dr_PORTS=("9401" "9402" "9403")
 export VAULT_ADDR=http://127.0.0.1:9301
 export VAULT_DATA="./${STORAGE}/primary"
 export VAULT_TOKEN=$(cat $VAULT_DATA/init.json | jq -r '.root_token')
-
+export VAULT_PREFIX=""
 echo "Using storage: ${bold}${STORAGE}${normal}"
 case "$1" in
 "help")
-        echo "${bold}Usage: $0 <vault command>| <operation command>${normal}"
+        echo "${bold}Usage: $0 <vault node> <vault command>| <operation command>${normal}"
         echo ""
         echo "${bold}init${normal}"
         echo "${bold}init_unsealer${normal}"
+        echo "${bold}init_recovery${normal}"        
         echo "${bold}unseal${normal}"
         echo "${bold}unseal_unsealer${normal}"
         echo "${bold}enable_replication${normal}"
         echo "${bold}vars${normal}: show Vault env vars"
         echo "${bold}yapi${normal}: runs yapi with correct variables"
+        echo "${bold}logs <node number>${normal}"
+
+;;
+"logs")
+        docker logs primary_vault0$2_1  -f 2>&1 |grep -v checkpoint
+;;
+"enable_unsealer")
+        set +e
+        export VAULT_ADDR=http://127.0.0.1:9300
+        export VAULT_TOKEN=$(cat $VAULT_DATA/unsealer_init.json | jq -r '.root_token')        
+        echo "Enabling transit secret"
+        yapi ${YAPI_PATH}/08-enable_transit.yaml
+        yapi ${YAPI_PATH}/09-setup_transit.yaml
 ;;
 "enable_replication")
         set +e
@@ -42,7 +56,7 @@ case "$1" in
 ;;
     "vars_unsealer")
         export VAULT_ADDR=http://127.0.0.1:9300
-        export VAULT_TOKEN=$(cat $VAULT_DATA/unsealer_init.json | jq -r '.root_token')    
+        export VAULT_TOKEN=$(cat $VAULT_DATA/unsealer_init.json | jq -r '.root_token')
         echo "Exporting variables for Unsealer Vault"
         echo "export VAULT_ADDR=\"${VAULT_ADDR}\""
         echo "export VAULT_TOKEN=\"${VAULT_TOKEN}\""
@@ -62,6 +76,13 @@ case "$1" in
             yapi ${YAPI_PATH}/01-init.yaml 
         fi
 ;;
+    "init_recovery")
+        # Initializaing and Unsealing
+        if [ ! -f "$VAULT_DATA/init.json" ]; then
+            echo "Initializing Vault cluster ${CLUSTER} at ${VAULT_ADDR}, files stored in ${VAULT_DATA}"
+            yapi ${YAPI_PATH}/10-init_recovery.yaml 
+        fi    
+;;
     "init")
         # Initializaing and Unsealing
         if [ ! -f "$VAULT_DATA/init.json" ]; then
@@ -80,6 +101,8 @@ case "$1" in
         yapi ${YAPI_PATH}/02-unseal.yaml
 ;;
     *)
-        vault ${@:1}
+        export VAULT_ADDR=http://127.0.0.1:930$1
+        echo "VAULT_ADDR=${VAULT_ADDR}"
+        vault ${@:2}
 ;;    
 esac

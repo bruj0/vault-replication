@@ -16,7 +16,7 @@ typeset -a VAULT_primary_PORTS=("9201" "9202" "9203")
 typeset -a VAULT_secondary_PORTS=("9301" "9302" "9303")
 typeset -a VAULT_dr_PORTS=("9401" "9402" "9403")
 export VAULT_ADDR=http://127.0.0.1:9201
-echo "Using storage: ${bold}${STORAGE}${normal}"
+echo "# Using storage: ${STORAGE}"
 case "$1" in
     "wipe")
          sudo rm -fr storage/raft/${VAULT_CLUSTER}
@@ -31,15 +31,14 @@ case "$1" in
     "config")
         ${COMPOSE_CMD} config
     ;;
+    "compose")
+        ${COMPOSE_CMD} ${@:2}
+    ;;
     "up")
         if [ "$3"=="recreate" ]; then
             RECREATE="--force-recreate"
         fi
         echo "Starting up ${VAULT_CLUSTER} Cluster with version $VAULT_VERSION"
-        if [ "$1" == "recreate" ]; then
-            RECREATE="--force-recreate"
-            echo "* Forcing recreate"
-        fi    
         ${COMPOSE_CMD} up -d ${RECREATE}
     ;;
      *)
