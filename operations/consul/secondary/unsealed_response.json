@@ -1,0 +1,1 @@
+{"type":"shamir","initialized":true,"sealed":false,"t":1,"n":1,"progress":0,"nonce":"","version":"1.3.4+prem","migration":false,"cluster_name":"Secondary","cluster_id":"b9f0f07a-949f-b2e7-928b-cd359a1d0b97","recovery_seal":false,"storage_type":"consul"}

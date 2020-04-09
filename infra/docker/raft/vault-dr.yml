@@ -1,0 +1,24 @@
+version: "3"
+networks:
+  vault_dr:
+    external: true
+
+services:
+  ## VAULT cluster configuration
+  vault01: &vault-server
+    networks:
+      - vault_dr
+    ports:
+      - 9401:8200
+
+  vault02:
+    networks:
+      - vault_dr
+    ports:
+      - 9402:8200
+
+  vault03:
+    networks:
+      - vault_dr
+    ports:
+      - 9403:8200

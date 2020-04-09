@@ -1,0 +1,27 @@
+version: "3"
+  ## VAULT cluster configuration
+services:
+  vault_unsealer: 
+    volumes:
+      - ./primary:/vault/config
+      - ./../storage/raft/${VAULT_CLUSTER}/unsealer:/vault/raft  
+    ports:
+      - 9300:8200
+  vault01: 
+    volumes:
+      - ./primary:/vault/config
+      - ./../storage/raft/${VAULT_CLUSTER}/01:/vault/raft  
+    ports:
+      - 9301:8200
+  vault02:
+    volumes:
+      - ./primary:/vault/config
+      - ./../storage/raft/${VAULT_CLUSTER}/02:/vault/raft  
+    ports:
+      - 9302:8200
+  vault03:
+    volumes:
+      - ./primary:/vault/config
+      - ./../storage/raft/${VAULT_CLUSTER}/03:/vault/raft
+    ports:
+      - 9303:8200

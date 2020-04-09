@@ -1,0 +1,33 @@
+#!/bin/bash
+bold=$(tput bold)
+normal=$(tput sgr0)
+case "$1" in
+    "init")
+    networks=(
+        vault_primary
+        vault_secondary
+        vault_dr
+        vault_primaryA
+        vault_primaryB
+        vault_primaryC
+        vault_secondaryA
+        vault_secondaryB
+        vault_secondaryC
+        vault_drA
+        vault_drB
+        vault_drC
+    )
+    for n in ${networks[@]}
+    do
+        docker network create -d bridge $n
+    done
+;;
+     *)
+        echo "${bold}Usage: $0 <command> <subcommand>${normal}"
+        echo "Commands:"
+        echo "  ${bold}init${normal}: Will initialize the networks"
+        echo "  ${bold}proxy${normal}"
+        echo "      ${bold}start${normal}:<raft|consul>"
+        echo "      ${bold}stop${normal}: <raft|consul>"
+    ;;  
+esac

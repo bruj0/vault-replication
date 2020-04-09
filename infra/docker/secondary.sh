@@ -4,8 +4,10 @@
 if [[ "$DEBUG" == "true" ]];then
     set -x
 fi
-VAULT_VERSION="1.3.4"
-COMPOSE_CMD="docker-compose --project-directory ./config --project-name secondary -f config/vault-secondary.yml -f config/vault.yml"
+VAULT_CLUSTER="secondary"
+STORAGE={$VAULT_STORAGE:-raft}
+VAULT_VERSION=${VAULT_VARIABLE:-"1.3.4"}
+COMPOSE_CMD="docker-compose --project-directory ./${STORAGE} --project-name secondary -f ${STORAGE}/vault-secondary.yml -f ${STORAGE}/vault.yml"
 bold=$(tput bold)
 normal=$(tput sgr0)
 VAULT_ADDR=http://127.0.0.1:9201

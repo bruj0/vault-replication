@@ -1,19 +1,19 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 # To enable debug: export DEBUG=true
-
+if [[ "$DEBUG" == "true" ]];then
+    set -x
+fi
+STORAGE={$VAULT_STORAGE:-consul}
 export CONSUL_CLUSTER=$1
-VAULT_VERSION=$(grep image config/consul.yaml | head -1 | awk -F ":" '{print $3}')
-COMPOSE_CMD="docker-compose --project-directory ./config --project-name ${CONSUL_CLUSTER} -f config/consul-${CONSUL_CLUSTER}.yml -f config/consul.yml"
+VAULT_VERSION=$(grep image consul/consul.yml | head -1 | awk -F ":" '{print $3}')
+COMPOSE_CMD="docker-compose --project-directory ./consul --project-name ${CONSUL_CLUSTER} -f consul/consul-${CONSUL_CLUSTER}.yml -f consul/consul.yml"
 bold=$(tput bold)
 normal=$(tput sgr0)
 VAULT_ADDR=http://127.0.0.1:9201
 
 #External variables used by other scripts
 
-
-
 case "$2" in
-
     "config")
         ${COMPOSE_CMD} config
     ;;

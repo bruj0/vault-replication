@@ -1,8 +1,6 @@
 .vagrant
 *~
-operations/data/dr/*.json
-operations/data/primary/*.json
-operations/data/secondary/*.json
+infra/docker/storage/raft/*
 infra/docker/storage/consul/primary
 infra/docker/storage/consul/secondary
 infra/docker/storage/consul/dr
