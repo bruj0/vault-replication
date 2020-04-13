@@ -26,6 +26,7 @@
       - [Docker Consul](#docker-consul)
       - [Replication](#replication)
   - [Check that replication is up](#check-that-replication-is-up)
+    - [Commands supported](#commands-supported)
   - [Exposed ports: local -> container](#exposed-ports-local---container)
     - [Raft Primary](#raft-primary)
     - [Raft Secondary](#raft-secondary)
@@ -232,6 +233,8 @@ mode                           secondary
 primary_cluster_addr           https://172.28.0.6:8201
 secondary_id                   secondary
 state                          stream-wals
+```
+
 ### Commands supported
 
 ```bash
