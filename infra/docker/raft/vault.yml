@@ -1,36 +1,42 @@
 version: "3"
-networks:
-  vault_primaryA:
-    external: true
-  vault_primaryB:
-    external: true
-  vault_primaryC:
-    external: true
 services:
   vault01: &vault_server
     image: vault-prem:1.4.0
-    networks:
-      - vault_primaryA
-      - vault_primaryB
-      - vault_primaryC
     environment:
       #- VAULT_CLUSTER_INTERFACE=eth0
       - VAULT_REDIRECT_INTERFACE=eth0
       #- VAULT_API_ADDR=http://vault01:8200
       #- VAULT_LOG_LEVEL=debug
+      - VAULT_TOKEN=autounseal
     command: vault server -config=/vault/config/vault01.hcl
+    volumes:
+      - ./${VAULT_CLUSTER}:/vault/config
+      - ./../storage/raft/${VAULT_CLUSTER}/01:/vault/raft
     cap_add:
       - IPC_LOCK
+    networks:
+      - vault_${VAULT_CLUSTER}A
+      - vault_${VAULT_CLUSTER}B
+      - vault_${VAULT_CLUSTER}C
   vault02:
     <<: *vault_server
     depends_on:
       - vault_unsealer
     command: vault server -config=/vault/config/vault02.hcl
+    volumes:
+      - ./${VAULT_CLUSTER}:/vault/config
+      - ./../storage/raft/${VAULT_CLUSTER}/02:/vault/raft
   vault03:
     <<: *vault_server
     depends_on:
       - vault_unsealer
     command: vault server -config=/vault/config/vault03.hcl
+    volumes:
+      - ./${VAULT_CLUSTER}:/vault/config
+      - ./../storage/raft/${VAULT_CLUSTER}/03:/vault/raft
   vault_unsealer:
     <<: *vault_server
     command: vault server -config=/vault/config/vault_unsealer.hcl
+    volumes:
+      - ./${VAULT_CLUSTER}:/vault/config
+      - ./../storage/raft/${VAULT_CLUSTER}/unsealer:/vault/raft

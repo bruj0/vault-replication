@@ -6,6 +6,11 @@ listener "tcp" {
   address = "primary_vault01_1:8200"
   cluster_address = "primary_vault01_1:8201"
   tls_disable = true
+telemetry {
+  prometheus_retention_time = "30s"
+  disable_hostname          = true
+  unauthenticated_metrics_access = true
+}  
 }
 seal "transit" {
   address            = "http://primary_vault_unsealer_1:8200"
@@ -20,9 +25,6 @@ seal "transit" {
 ui = "true"
 cluster_addr = "http://primary_vault01_1:8201"
 cluster_name = "Primary"
-telemetry {
-  prometheus_retention_time = "30s"
-  disable_hostname          = true
-}
+
 raw_storage_endpoint = true
 log_level = "debug"

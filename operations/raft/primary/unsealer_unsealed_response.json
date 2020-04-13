@@ -1,1 +1,0 @@
-{"type":"shamir","initialized":true,"sealed":false,"t":1,"n":1,"progress":0,"nonce":"","version":"1.4.0+prem","migration":false,"cluster_name":"Unsealer","cluster_id":"af628157-0abd-fab1-bf67-71ac7c4506e3","recovery_seal":false,"storage_type":"raft"}

@@ -5,7 +5,10 @@ infra/docker/storage/consul/primary
 infra/docker/storage/consul/secondary
 infra/docker/storage/consul/dr
 infra/docker/image/vault
-operations/raft/primary/
-operations/raft/secondary/
-operations/raft/dr/
+ops/raft/primary/*.json
+ops/raft/secondary/*.json
+ops/raft/dr/*.json
+ops/consul/primary/*.json
+ops/consul/secondary/*.json
+ops/consul/dr/*.json
 old/
