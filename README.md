@@ -1,4 +1,7 @@
 - [What](#what)
+  - [Features:](#features)
+- [Why](#why)
+- [How](#how)
   - [Infrastructure](#infrastructure)
     - [Docker-compose](#docker-compose)
       - [Integrated Storage](#integrated-storage)
@@ -10,8 +13,6 @@
       - [Consul](#consul)
         - [Regions](#regions-1)
         - [Zones](#zones-1)
-- [Why](#why)
-- [How](#how)
   - [Requirements](#requirements)
   - [Networks](#networks)
     - [Communication between Regions](#communication-between-regions)
@@ -34,8 +35,31 @@
 - [TODO](#todo)
 - [Done](#done)
 # What
-A way to create multiple Vault clusters and setup different types of Replication between them as close as possible to the "Vault reference architecture" https://learn.hashicorp.com/vault/operations/ops-reference-architecture
 
+A system to facilitate the creation of multiple Vault clusters.
+Automating the setup of different types of Replication between them as close as possible to the [Vault reference architecture]( https://learn.hashicorp.com/vault/operations/ops-reference-architecture
+)
+## Features:
+* Infrastructure 
+  * Docker: via docker-compose templates
+  * Kubernetes: via helm charts
+    * Local (kind, k3s)
+    * Cloud (GCP,EKS)
+  * VMs: via terraform
+* Storages
+  * Consul
+  * Raft
+* Operations
+  * Initialization
+  * Unsealing
+  * Replication setup
+* Monitoring
+  * Prometheus
+  * Grafana
+
+# Why 
+To be able to easily setup and test different configuration and features of a full fledge Vault and Consul cluster setup.
+# How 
 ## Infrastructure
 ### Docker-compose
 #### Integrated Storage
@@ -81,10 +105,7 @@ The regions are the same as in Integrated Storage but only one network per Zone.
 ##### Zones
 ![1 zone](vault-ra-1-az.png)
 
-# Why 
-To be able to easily setup and test different configuration and features of a full fledge Vault and Consul cluster setup.
 
-# How 
 
 ## Requirements 
 * Docker 
