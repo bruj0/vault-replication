@@ -296,7 +296,7 @@ Vault03:
 - [ ] Docker image build documentation
 - [ ] Configure Monitoring
 - [ ] Generate PKI certificates and use them
-- [] Configure DR cluster
+- [ ] Configure DR cluster
 
 # Done
 - [X] HSM auto unsealing
