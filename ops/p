@@ -32,17 +32,30 @@ case "$1" in
 "help")
         echo "Using storage: ${bold}${STORAGE}${normal}"
         echo "${bold}Usage: $0 <vault node> <vault command>| <operation command>${normal}"
-        echo ""
-        echo "${bold}wipe${normal}"
-        echo "${bold}init${normal}"
-        echo "${bold}init_unsealer${normal}"
-        echo "${bold}init_recovery${normal}"        
-        echo "${bold}unseal${normal}"
-        echo "${bold}unseal_unsealer${normal}"
-        echo "${bold}enable_replication${normal}"
-        echo "${bold}vars${normal}: show Vault env vars"
-        echo "${bold}yapi${normal}: runs yapi with correct variables"
-        echo "${bold}logs <node number>${normal}"
+        echo "Raft:"
+        echo "  ${bold}init_unsealer${normal}"
+        echo "  ${bold}unseal_unsealer${normal}"
+        echo "  ${bold}config_unsealer${normal}"
+        echo "  ${bold}init_recovery${normal}"
+        echo "  ${bold}<vault node> raft_config${normal}"
+
+        echo "Consul:"
+        echo "  ${bold}init${normal}"
+        echo "  ${bold}unseal${normal}"
+
+        echo "Replication":
+        echo "    ${bold}enable_perf${normal}"
+        echo "    ${bold}activate_perf${normal}(only on secondary)" 
+
+        echo "General:"
+        echo "  ${bold}wipe${normal}"
+        echo "  ${bold}vars${normal}: show Vault env vars"
+        echo "  ${bold}vars_unsealer${normal}: show Vault env vars for the unsealer"
+        echo "  ${bold}yapi${normal}: runs yapi with correct variables"
+        echo "  ${bold}logs <node number>${normal}"
+        echo "  ${bold}generate_root_recovery${normal}"
+
+        
 
 ;;
 "wipe")
@@ -141,7 +154,7 @@ case "$1" in
         export VAULT_ADDR=${VAULT_BASE_ADDR}$1
         case "$2" in
             "raft_config")
-                    vault read -format=json sys/storage/raft/configuration
+                    vault read -format=json sys/storage/raft/configuration | jq
                     exit 1
             ;;
         esac

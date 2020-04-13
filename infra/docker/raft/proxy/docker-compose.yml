@@ -37,7 +37,7 @@ services:
       - LOG_LEVEL=debug
     ports:
       - "8801:8200"
-      - "8901:9200"
+      - "8901:9300"
       - "8819:1936"
     volumes:
       - "./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro"
