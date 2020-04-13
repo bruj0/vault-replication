@@ -18,15 +18,16 @@
     - [Communication between Regions](#communication-between-regions)
   - [Initial configuration](#initial-configuration)
     - [Install yapi](#install-yapi)
-    - [Docker Infrastructure](#docker-infrastructure)
-      - [Primary Cluster](#primary-cluster)
-      - [Secondary Cluster](#secondary-cluster)
-      - [DR Cluster](#dr-cluster)
-    - [Docker Operations](#docker-operations)
-      - [Integrated Storage](#integrated-storage-1)
-      - [Docker Consul](#docker-consul)
-      - [Configure Performance Replication](#configure-performance-replication)
-        - [Check that replication is up](#check-that-replication-is-up)
+  - [Docker Infrastructure](#docker-infrastructure)
+    - [Primary Cluster](#primary-cluster)
+    - [Secondary Cluster](#secondary-cluster)
+    - [DR Cluster](#dr-cluster)
+  - [Docker Operations](#docker-operations)
+    - [Integrated Storage](#integrated-storage-1)
+    - [Docker Consul](#docker-consul)
+  - [Replication](#replication)
+    - [Configure Performance Replication](#configure-performance-replication)
+    - [Check that replication is up](#check-that-replication-is-up)
   - [Commands supported](#commands-supported)
   - [Exposed ports: local -> container](#exposed-ports-local---container)
     - [Raft Primary](#raft-primary)
@@ -138,7 +139,7 @@ $ pip install -U yapi-ci
 $ yapi --version
 0.1.6
 ```
-### Docker Infrastructure 
+## Docker Infrastructure 
 - Set Storage to use
 ```bash
 $ export STORAGE=raft
@@ -147,21 +148,21 @@ $ export STORAGE=raft
 ```bash
 $ infra/docker/networks.sh
 ```
-#### Primary Cluster
+### Primary Cluster
 ```bash
 $ infra/docker/p up
 ```
-#### Secondary Cluster
+### Secondary Cluster
 ```bash
 $ infra/docker/s up
 ```
-#### DR Cluster
+### DR Cluster
 ```bash
 $ infra/docker/dr up
 ```
 
-### Docker Operations
-#### Integrated Storage
+## Docker Operations
+### Integrated Storage
 * Init unsealer
 ```bash
 $ ops/p init_unsealer
@@ -212,16 +213,16 @@ vault01    primary_vault01_1:8201    leader      true
 vault02    primary_vault02_1:8201    follower    true
 vault03    primary_vault03_1:8201    follower    true
 ```
-#### Docker Consul
+### Docker Consul
 TODO
-
-#### Configure Performance Replication
+## Replication
+### Configure Performance Replication
 ```bash
 $ ops/p enable_perf
 $ ops/s activate_perf
 ```
 
-##### Check that replication is up
+### Check that replication is up
 Primary cluster:
 
 ```bash
