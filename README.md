@@ -24,9 +24,9 @@
     - [Docker Operations](#docker-operations)
       - [Integrated Storage](#integrated-storage-1)
       - [Docker Consul](#docker-consul)
-      - [Replication](#replication)
-  - [Check that replication is up](#check-that-replication-is-up)
-    - [Commands supported](#commands-supported)
+      - [Configure Performance Replication](#configure-performance-replication)
+        - [Check that replication is up](#check-that-replication-is-up)
+  - [Commands supported](#commands-supported)
   - [Exposed ports: local -> container](#exposed-ports-local---container)
     - [Raft Primary](#raft-primary)
     - [Raft Secondary](#raft-secondary)
@@ -194,13 +194,13 @@ vault03    primary_vault03_1:8201    follower    true
 #### Docker Consul
 TODO
 
-#### Replication
+#### Configure Performance Replication
 ```bash
 $ ops/p enable_perf
 $ ops/s activate_perf
 ```
 
-## Check that replication is up
+##### Check that replication is up
 Primary cluster:
 
 ```bash
@@ -235,7 +235,7 @@ secondary_id                   secondary
 state                          stream-wals
 ```
 
-### Commands supported
+## Commands supported
 
 ```bash
 $ ops/p help
