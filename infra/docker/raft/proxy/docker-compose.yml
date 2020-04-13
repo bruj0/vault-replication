@@ -1,0 +1,43 @@
+version: "3"
+networks:
+  vault_primaryA:
+    external: true
+  vault_primaryB:
+    external: true
+  vault_primaryC:
+    external: true
+  vault_secondaryA:
+    external: true
+  vault_secondaryB:
+    external: true
+  vault_secondaryC:
+    external: true
+  vault_drA:
+    external: true
+  vault_drB:
+    external: true
+  vault_drC:
+    external: true
+
+services:
+  haproxy:
+    image: haproxy:2.0
+    container_name: raft_proxy
+    networks:
+      - vault_primaryA
+      - vault_primaryB
+      - vault_primaryC
+      - vault_secondaryA
+      - vault_secondaryB
+      - vault_secondaryC
+      - vault_drA
+      - vault_drB
+      - vault_drC
+    environment:
+      - LOG_LEVEL=debug
+    ports:
+      - "8801:8200"
+      - "8901:9200"
+      - "8819:1936"
+    volumes:
+      - "./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro"

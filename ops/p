@@ -25,9 +25,6 @@ bold=$(tput bold)
 normal=$(tput sgr0)
 STORAGE=${STORAGE:-"raft"}
 #Internal variables
-typeset -a VAULT_primary_PORTS=("9201" "9202" "9203")
-typeset -a VAULT_secondary_PORTS=("9301" "9302" "9303")
-typeset -a VAULT_dr_PORTS=("9401" "9402" "9403")
 export VAULT_DATA="ops/${STORAGE}/${VAULT_CLUSTER}"
 export VAULT_TOKEN=$(cat $VAULT_DATA/init.json | jq -r '.root_token')
 export VAULT_PREFIX=""
@@ -64,7 +61,7 @@ case "$1" in
 ;;
 "enable_perf")
         set +e
-        export SECONDARY_HAPROXY_ADDR=$(docker network inspect vault_secondary | jq -r '.[] .Containers | with_entries(select(.value.Name=="haproxy"))| .[] .IPv4Address' | awk -F "/" '{print $1}')
+        export SECONDARY_HAPROXY_ADDR=$(docker network inspect vault_secondaryA | jq -r '.[] .Containers | with_entries(select(.value.Name=="raft_proxy"))| .[] .IPv4Address' | awk -F "/" '{print $1}')
         echo "Enabling replication in ${VAULT_CLUSTER}"
         yapi ${YAPI_PATH}/03-replication_enable_primary.yaml 
 
@@ -77,12 +74,19 @@ case "$1" in
        # yapi yapi/vault/05-replication_activate_secondary.yaml         
 ;;
 "activate_perf")
+        if [ "$0" == "ops/p" ]; then
+            echo "Must be activated in secondary"
+            exit 0
+        fi
         echo "Enabling secondary replication to primary"
-        yapi vault/05-replication_activate_secondary.yaml 
+        export VAULT_DATA_PRIMARY="ops/${STORAGE}/primary"
+        export SECONDARY_HAPROXY_ADDR=$(docker network inspect vault_secondaryA | jq -r '.[] .Containers | with_entries(select(.value.Name=="raft_proxy"))| .[] .IPv4Address' | awk -F "/" '{print $1}')
+        yapi ${YAPI_PATH}/05-replication_activate_secondary.yaml 
 ;;
-"generate_root")
+"generate_root_recovery")
         echo "Creating a root token for secondary with the new unseal keys"
-        yapi vault/06-replication_generate_root_secondary.yaml 
+        export VAULT_DATA_PRIMARY="ops/${STORAGE}/primary"        
+        yapi ${YAPI_PATH}/11-replication_generate_root_recovery.yaml
 ;;
     "yapi")
         yapi ${@}
@@ -95,7 +99,7 @@ case "$1" in
 ;;
 
     "vars")
-        echo "Exporting variables for Primary Vault"
+        echo "Exporting variables for ${VAULT_CLUSTER} Vault"
         echo "export VAULT_ADDR=\"${VAULT_ADDR}\""
         echo "export VAULT_TOKEN=\"${VAULT_TOKEN}\""
 ;;

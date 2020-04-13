@@ -2,6 +2,9 @@
 bold=$(tput bold)
 normal=$(tput sgr0)
 case "$1" in
+    "proxy")
+    docker-compose --project-directory infra/docker/raft/proxy --project-name raft -f infra/docker/raft/proxy/docker-compose.yml up -d
+;;
     "init")
     networks=(
         vault_primary
@@ -29,5 +32,5 @@ case "$1" in
         echo "  ${bold}proxy${normal}"
         echo "      ${bold}start${normal}:<raft|consul>"
         echo "      ${bold}stop${normal}: <raft|consul>"
-    ;;  
+;;  
 esac
