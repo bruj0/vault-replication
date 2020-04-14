@@ -45,6 +45,7 @@ case "$1" in
 
         echo "Replication":
         echo "    ${bold}enable_perf${normal}"
+        echo "    ${bold}disable_secondary${normal}"
         echo "    ${bold}activate_perf${normal}(only on secondary)" 
 
         echo "General:"
@@ -85,6 +86,9 @@ case "$1" in
        # VAULT_TOKEN_SEC=$(cat secondary/${VAULT_DATA}/init.json | jq -r '.root_token')
        # VAULT_ADDR=http://127.0.0.1:9301 VAULT_TOKEN=${VAULT_TOKEN_SEC} \
        # yapi yapi/vault/05-replication_activate_secondary.yaml         
+;;
+"disable_secondary")
+    vault write -f sys/replication/performance/primary/revoke-secondary id=secondary
 ;;
 "activate_perf")
         if [ "$0" == "ops/p" ]; then

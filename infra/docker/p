@@ -38,6 +38,12 @@ case "$1" in
     "config")
         ${COMPOSE_CMD} config
     ;;
+    "unpause")
+        ${COMPOSE_CMD} unpause
+    ;;    
+    "pause")
+        ${COMPOSE_CMD} pause
+    ;;    
     "compose")
         ${COMPOSE_CMD} ${@:2}
     ;;

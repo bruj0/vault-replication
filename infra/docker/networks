@@ -3,7 +3,7 @@ bold=$(tput bold)
 normal=$(tput sgr0)
 case "$1" in
     "proxy")
-    docker-compose --project-directory infra/docker/raft/proxy --project-name raft -f infra/docker/raft/proxy/docker-compose.yml up -d
+    docker-compose --project-directory infra/docker/raft/proxy --project-name raft -f infra/docker/raft/proxy/docker-compose.yml up -d  --force-recreate
 ;;
     "init")
     networks=(

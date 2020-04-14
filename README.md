@@ -26,6 +26,7 @@
     - [Integrated Storage](#integrated-storage-1)
     - [Docker Consul](#docker-consul)
   - [Replication](#replication)
+    - [Start the Proxy between clusters](#start-the-proxy-between-clusters)
     - [Configure Performance Replication](#configure-performance-replication)
     - [Check that replication is up](#check-that-replication-is-up)
   - [Commands supported](#commands-supported)
@@ -216,6 +217,10 @@ vault03    primary_vault03_1:8201    follower    true
 ### Docker Consul
 TODO
 ## Replication
+### Start the Proxy between clusters
+```bash
+$ infra/docker/networks proxy
+```
 ### Configure Performance Replication
 ```bash
 $ ops/p enable_perf
