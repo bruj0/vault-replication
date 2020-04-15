@@ -1,2 +1,2 @@
 #!/bin/bash -x
-helm template vault-injector . --namespace vault-injector --output-dir out -f values-auto.yaml
+helm template vault vault-helm/ --namespace vault --output-dir out -f values-ha-raft.yaml

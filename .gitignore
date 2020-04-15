@@ -12,3 +12,6 @@ ops/consul/primary/*.json
 ops/consul/secondary/*.json
 ops/consul/dr/*.json
 old/
+infra/k8s/vault/vault-helm/
+infra/k8s/vault/out/
+root.txt
