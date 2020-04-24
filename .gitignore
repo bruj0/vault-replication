@@ -8,6 +8,12 @@ infra/docker/image/vault
 ops/raft/primary/*.json
 ops/raft/secondary/*.json
 ops/raft/dr/*.json
+ops/raft/primary/ssl/
+ops/raft/secondary/ssl/
+ops/raft/dr/ssl/
+infra/k8s/gke/*.tfstate
+infra/k8s/gke/*.tfstate.backup
+infra/k8s/gke/.terraform
 ops/consul/primary/*.json
 ops/consul/secondary/*.json
 ops/consul/dr/*.json
@@ -15,3 +21,4 @@ old/
 infra/k8s/vault/vault-helm/
 infra/k8s/vault/out/
 root.txt
+infra/docker/raft/primary/ssl/

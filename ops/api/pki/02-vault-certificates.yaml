@@ -1,52 +1,69 @@
 ---
 test_name: 01-Create vault server certificate
 stages:
-
   - name: 02-Create vault01 server certificate
     request:
-      url: "{tavern.env_vars.VAULT_ADDR}/v1/pki/issue/dc1-vault"
+      url: "{env_vars.VAULT_ADDR}/v1/pki/issue/primary"
       method: POST
       headers:
-        X-Vault-Token: "{tavern.env_vars.VAULT_TOKEN}"
+        X-Vault-Token: "{env_vars.VAULT_TOKEN}"
       json:
-        common_name: "vault01.dc1.vault"
+        common_name: "primary_vault01_1"
         ttl": "720h"
     response:
       status_code: 200
       save:
         $ext:
-          function: myutils:save_response
+          function: extensions.save_response
           extra_kwargs:
-            filename: vault01-dc1-vault.json
+            path: "{env_vars.VAULT_DATA}/ssl/primary_vault01_1.json"
   - name: 03-Create vault02 server certificate
     request:
-      url: "{tavern.env_vars.VAULT_ADDR}/v1/pki/issue/dc1-vault"
+      url: "{env_vars.VAULT_ADDR}/v1/pki/issue/primary"
       method: POST
       headers:
-        X-Vault-Token: "{tavern.env_vars.VAULT_TOKEN}"
+        X-Vault-Token: "{env_vars.VAULT_TOKEN}"
       json:
-        common_name: "vault02.dc1.vault"
+        common_name: "primary_vault02_1"
         ttl": "720h"
     response:
       status_code: 200
       save:
         $ext:
-          function: myutils:save_response
+          function: extensions.save_response
           extra_kwargs:
-            filename: vault02-dc1-vault.json
+            path: "{env_vars.VAULT_DATA}/ssl/primary_vault02_1.json"
   - name: 04-Create vault03 server certificate
     request:
-      url: "{tavern.env_vars.VAULT_ADDR}/v1/pki/issue/dc1-vault"
+      url: "{env_vars.VAULT_ADDR}/v1/pki/issue/primary"
       method: POST
       headers:
-        X-Vault-Token: "{tavern.env_vars.VAULT_TOKEN}"
+        X-Vault-Token: "{env_vars.VAULT_TOKEN}"
       json:
-        common_name: "vault03.dc1.vault"
+        common_name: "primary_vault03_1"
+        alt_names: "primary_vault03_1"
         ttl": "720h"
     response:
       status_code: 200
       save:
         $ext:
-          function: myutils:save_response
+          function: extensions.save_response
           extra_kwargs:
-            filename: vault03-dc1-vault.json
+            path: "{env_vars.VAULT_DATA}/ssl/primary_vault03_1.json"
+  - name: 05-Create unsealer server certificate
+    request:
+      url: "{env_vars.VAULT_ADDR}/v1/pki/issue/primary"
+      method: POST
+      headers:
+        X-Vault-Token: "{env_vars.VAULT_TOKEN}"
+      json:
+        common_name: "primary_vault_unsealer_1"
+        ip_sans: "127.0.0.1"
+        ttl": "720h"
+    response:
+      status_code: 200
+      save:
+        $ext:
+          function: extensions.save_response
+          extra_kwargs:
+            path: "{env_vars.VAULT_DATA}/ssl/primary_vault_unsealer_1.json"

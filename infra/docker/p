@@ -48,11 +48,11 @@ case "$1" in
         ${COMPOSE_CMD} ${@:2}
     ;;
     "up")
-        if [ "$3"=="recreate" ]; then
+        if [ "$3" == "recreate" ]; then
             RECREATE="--force-recreate"
         fi
         echo "Starting up ${VAULT_CLUSTER} Cluster with version $VAULT_VERSION"
-        ${COMPOSE_CMD} up -d ${RECREATE}
+        ${COMPOSE_CMD} up -d ${RECREATE} $2 
     ;;
      *)
         echo "${bold}Usage: $0 <command> <subcommand>${normal}"

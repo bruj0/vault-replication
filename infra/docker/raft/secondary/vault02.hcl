@@ -22,9 +22,9 @@ seal "transit" {
   key_name           = "autounseal"
   mount_path         = "transit/"
 }
-replication {
- resolver_discover_servers = false
-}
+#replication {
+# resolver_discover_servers = false
+#}
 ui = "true"
 cluster_addr = "http://secondary_vault02_1:8201"
 cluster_name = "Secondary"

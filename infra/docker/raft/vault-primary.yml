@@ -23,3 +23,6 @@ services:
   vault_unsealer:
     ports:
       - 9300:8200
+  vault_pki:
+    ports:
+      - 9304:8200

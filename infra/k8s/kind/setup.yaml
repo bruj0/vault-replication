@@ -5,7 +5,7 @@ nodes:
   - role: control-plane
   - role: worker
   - role: worker
-containerdConfigPatches:
-  - |-
-    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:5000"]
-      endpoint = ["http://172.17.0.5:5000"]
+#containerdConfigPatches:
+#  - |-
+#    [plugins."io.containerd.grpc.v1.cri".registry.mirrors."localhost:5000"]
+#      endpoint = ["http://172.17.0.5:5000"]

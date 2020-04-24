@@ -10,17 +10,20 @@ if [[ "$DEBUG" == "true" ]];then
 fi
 if [ "$0" == "ops/p" ]; then
     export VAULT_CLUSTER="primary"
-    export VAULT_ADDR=http://127.0.0.1:9301
-    export VAULT_BASE_ADDR=http://127.0.0.1:930
-    export VAULT_UNSEALER_ADDR=http://127.0.0.1:9300
+    export VAULT_ADDR=https://127.0.0.1:9301
+    export VAULT_BASE_ADDR=https://127.0.0.1:930
+    export VAULT_UNSEALER_ADDR=https://127.0.0.1:9300
+    export VAULT_PKI_ADDR=http://127.0.0.1:9304
     
 else
     export VAULT_CLUSTER="secondary"
-    export VAULT_ADDR=http://127.0.0.1:9501
-    export VAULT_BASE_ADDR=http://127.0.0.1:950
-    export VAULT_UNSEALER_ADDR=http://127.0.0.1:9500    
+    export VAULT_ADDR=https://127.0.0.1:9501
+    export VAULT_BASE_ADDR=https://127.0.0.1:950
+    export VAULT_UNSEALER_ADDR=https://127.0.0.1:9500
+    export VAULT_PKI_ADDR=http://127.0.0.1:9504
 fi
-YAPI_PATH="ops/api/vault"
+YAPI_BASE="ops/api"
+YAPI_PATH="${YAPI_BASE}/vault"
 bold=$(tput bold)
 normal=$(tput sgr0)
 STORAGE=${STORAGE:-"raft"}
@@ -32,10 +35,18 @@ case "$1" in
 "help")
         echo "Using storage: ${bold}${STORAGE}${normal}"
         echo "${bold}Usage: $0 <vault node> <vault command>| <operation command>${normal}"
-        echo "Raft:"
+
+        echo "PKI:"
+        echo "  ${bold}init_pki${normal}"
+        echo "  ${bold}unseal_pki${normal}"
+        echo "  ${bold}config_pki${normal}"
+
+        echo "Unsealer:"
         echo "  ${bold}init_unsealer${normal}"
         echo "  ${bold}unseal_unsealer${normal}"
         echo "  ${bold}config_unsealer${normal}"
+
+        echo "Raft:"
         echo "  ${bold}init_recovery${normal}"
         echo "  ${bold}<vault node> raft_config${normal}"
 
@@ -56,14 +67,72 @@ case "$1" in
         echo "  ${bold}logs <node number>${normal}"
         echo "  ${bold}generate_root_recovery${normal}"
 
-        
-
+    ;;
+## PKI
+"init_pki")
+        # Initializaing and Unsealing
+        if [ ! -f "$VAULT_DATA/pki_init.json" ]; then
+            export VAULT_PREFIX="pki_"
+            export VAULT_ADDR=${VAULT_PKI_ADDR}
+            echo "Initializing Vault PKI for ${VAULT_CLUSTER} at ${VAULT_ADDR}, files stored in ${VAULT_DATA}"
+            yapi ${YAPI_PATH}/01-init.yaml 
+        fi
 ;;
-"wipe")
-    rm $VAULT_DATA/*
+"unseal_pki")
+        export VAULT_PREFIX="pki_"
+        export VAULT_ADDR=${VAULT_PKI_ADDR}
+        echo "Unsealing Vault PKI"
+        yapi ${YAPI_PATH}/02-unseal.yaml
 ;;
-"logs")
-        docker logs ${VAULT_CLUSTER}_vault0$2_1  -f 2>&1 |grep -v checkpoint
+"config_pki")
+        set +e
+        export VAULT_ADDR=${VAULT_PKI_ADDR}
+        export VAULT_TOKEN=$(cat $VAULT_DATA/pki_init.json | jq -r '.root_token')        
+        echo "Enabling PKI secret engine"
+        yapi --debug ${YAPI_BASE}/pki/01-enable-pki.yaml
+        sleep 3
+        yapi ${YAPI_BASE}/pki/02-vault-certificates.yaml
+;;
+"copy_certs")
+    CA=$(cat ops/raft/${VAULT_CLUSTER}/ssl/signed_intermediate_ca.json |jq -r ".data.issuing_ca")
+    INTCA=$(cat ops/raft/${VAULT_CLUSTER}/ssl/signed_intermediate_ca.json |jq -r ".data.certificate")
+    for i in "vault01" "vault02" "vault03" "vault_unsealer"; do
+        echo "Building cert for $i"
+        CRT=$(cat ops/raft/${VAULT_CLUSTER}/ssl/${VAULT_CLUSTER}_${i}_1.json |jq -r ".data.certificate")
+        KEY=$(cat ops/raft/${VAULT_CLUSTER}/ssl/${VAULT_CLUSTER}_${i}_1.json |jq -r ".data.private_key")
+        cat >infra/docker/${STORAGE}/${VAULT_CLUSTER}/ssl/${i}.pem << EOL
+${CRT}
+${INTCA}
+EOL
+#        cat > infra/docker/${STORAGE}/${VAULT_CLUSTER}/ssl/${i}.pem << EOL
+#${CRT}
+#EOL
+        cat > infra/docker/${STORAGE}/${VAULT_CLUSTER}/ssl/${i}.key << EOL
+${KEY}
+EOL
+    done
+    cat > infra/docker/${STORAGE}/${VAULT_CLUSTER}/ssl/ca.pem << EOL
+${CA}
+EOL
+    cat > infra/docker/${STORAGE}/${VAULT_CLUSTER}/ssl/ca_int.pem << EOL
+${INTCA}
+EOL
+;;
+## Unsealer operations
+"init_unsealer")
+        # Initializaing and Unsealing
+        if [ ! -f "$VAULT_DATA/unsealer_init.json" ]; then
+            export VAULT_PREFIX="unsealer_"
+            export VAULT_ADDR=${VAULT_UNSEALER_ADDR}
+            echo "Initializing Vault cluster ${CLUSTER} at ${VAULT_ADDR}, files stored in ${VAULT_DATA}"
+            yapi ${YAPI_PATH}/01-init.yaml 
+        fi
+;;
+"unseal_unsealer")
+        export VAULT_PREFIX="unsealer_"
+        export VAULT_ADDR=${VAULT_UNSEALER_ADDR}
+        echo "Unsealing Vault Unsealer"
+        yapi ${YAPI_PATH}/02-unseal.yaml
 ;;
 "config_unsealer")
         set +e
@@ -73,6 +142,27 @@ case "$1" in
         yapi ${YAPI_PATH}/08-enable_transit.yaml
         yapi ${YAPI_PATH}/09-setup_transit.yaml
 ;;
+## Raft operations
+"init_recovery")
+        # Initializaing and Unsealing
+        if [ ! -f "$VAULT_DATA/init.json" ]; then
+            echo "Initializing Vault cluster ${CLUSTER} at ${VAULT_ADDR}, files stored in ${VAULT_DATA}"
+            yapi ${YAPI_PATH}/10-init_recovery.yaml 
+        fi    
+;;
+## Consul
+"init")
+        # Initializaing and Unsealing
+        if [ ! -f "$VAULT_DATA/init.json" ]; then
+            echo "Initializing Vault cluster ${CLUSTER} at ${VAULT_ADDR}, files stored in ${VAULT_DATA}"
+            yapi ${YAPI_PATH}/01-init.yaml 
+        fi    
+;;
+"unseal")
+        echo "Unsealing Vault"
+        yapi ${YAPI_PATH}/02-unseal.yaml
+;;
+## Replication
 "enable_perf")
         set +e
         export SECONDARY_HAPROXY_ADDR=$(docker network inspect vault_secondaryA | jq -r '.[] .Containers | with_entries(select(.value.Name=="raft_proxy"))| .[] .IPv4Address' | awk -F "/" '{print $1}')
@@ -100,59 +190,43 @@ case "$1" in
         export SECONDARY_HAPROXY_ADDR=$(docker network inspect vault_secondaryA | jq -r '.[] .Containers | with_entries(select(.value.Name=="raft_proxy"))| .[] .IPv4Address' | awk -F "/" '{print $1}')
         yapi ${YAPI_PATH}/05-replication_activate_secondary.yaml 
 ;;
-"generate_root_recovery")
-        echo "Creating a root token for secondary with the new unseal keys"
-        export VAULT_DATA_PRIMARY="ops/${STORAGE}/primary"        
-        yapi ${YAPI_PATH}/11-replication_generate_root_recovery.yaml
+
+## General
+"wipe")
+    rm $VAULT_DATA/*
 ;;
-    "yapi")
-        yapi ${@}
+"vars")
+        echo "Exporting variables for ${VAULT_CLUSTER} Vault"
+        echo "export VAULT_ADDR=\"${VAULT_ADDR}\""
+        echo "export VAULT_TOKEN=\"${VAULT_TOKEN}\""
 ;;
-    "vars_unsealer")
+"vars_unsealer")
         export VAULT_TOKEN=$(cat $VAULT_DATA/unsealer_init.json | jq -r '.root_token')
         echo "Exporting variables for Unsealer Vault"
         echo "export VAULT_ADDR=\"${VAULT_UNSEALER_ADDR}\""
         echo "export VAULT_TOKEN=\"${VAULT_TOKEN}\""
 ;;
-
-    "vars")
-        echo "Exporting variables for ${VAULT_CLUSTER} Vault"
-        echo "export VAULT_ADDR=\"${VAULT_ADDR}\""
+"vars_pki")
+        export VAULT_TOKEN=$(cat $VAULT_DATA/pki_init.json | jq -r '.root_token')
+        echo "Exporting variables for PKI Vault"
+        echo "export VAULT_ADDR=\"${VAULT_PKI_ADDR}\""
         echo "export VAULT_TOKEN=\"${VAULT_TOKEN}\""
 ;;
-    "init_unsealer")
-        # Initializaing and Unsealing
-        if [ ! -f "$VAULT_DATA/unsealer_init.json" ]; then
-            export VAULT_PREFIX="unsealer_"
-            export VAULT_ADDR=${VAULT_UNSEALER_ADDR}
-            echo "Initializing Vault cluster ${CLUSTER} at ${VAULT_ADDR}, files stored in ${VAULT_DATA}"
-            yapi ${YAPI_PATH}/01-init.yaml 
-        fi
+"yapi")
+        yapi ${@}
 ;;
-    "init_recovery")
-        # Initializaing and Unsealing
-        if [ ! -f "$VAULT_DATA/init.json" ]; then
-            echo "Initializing Vault cluster ${CLUSTER} at ${VAULT_ADDR}, files stored in ${VAULT_DATA}"
-            yapi ${YAPI_PATH}/10-init_recovery.yaml 
-        fi    
+"logs")
+        docker logs ${VAULT_CLUSTER}_vault0$2_1  -f 2>&1 |grep -v checkpoint
 ;;
-    "init")
-        # Initializaing and Unsealing
-        if [ ! -f "$VAULT_DATA/init.json" ]; then
-            echo "Initializing Vault cluster ${CLUSTER} at ${VAULT_ADDR}, files stored in ${VAULT_DATA}"
-            yapi ${YAPI_PATH}/01-init.yaml 
-        fi    
+
+"generate_root_recovery")
+        echo "Creating a root token for secondary with the new unseal keys"
+        export VAULT_DATA_PRIMARY="ops/${STORAGE}/primary"        
+        yapi ${YAPI_PATH}/11-replication_generate_root_recovery.yaml
 ;;
-    "unseal")
-        echo "Unsealing Vault"
-        yapi ${YAPI_PATH}/02-unseal.yaml
-;;
-    "unseal_unsealer")
-        export VAULT_PREFIX="unsealer_"
-        export VAULT_ADDR=${VAULT_UNSEALER_ADDR}
-        echo "Unsealing Vault Unsealer"
-        yapi ${YAPI_PATH}/02-unseal.yaml
-;;
+
+
+#Default
     *)
         set +x
         export VAULT_ADDR=${VAULT_BASE_ADDR}$1
