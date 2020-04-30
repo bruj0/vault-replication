@@ -89,8 +89,8 @@ case "$1" in
         export VAULT_ADDR=${VAULT_PKI_ADDR}
         export VAULT_TOKEN=$(cat $VAULT_DATA/pki_init.json | jq -r '.root_token')        
         echo "Enabling PKI secret engine"
-        yapi --debug ${YAPI_BASE}/pki/01-enable-pki.yaml
-        sleep 3
+        #yapi --debug ${YAPI_BASE}/pki/01-enable-pki.yaml
+        #sleep 3
         yapi ${YAPI_BASE}/pki/02-vault-certificates.yaml
 ;;
 "copy_certs")
@@ -102,7 +102,6 @@ case "$1" in
         KEY=$(cat ops/raft/${VAULT_CLUSTER}/ssl/${VAULT_CLUSTER}_${i}_1.json |jq -r ".data.private_key")
         cat >infra/docker/${STORAGE}/${VAULT_CLUSTER}/ssl/${i}.pem << EOL
 ${CRT}
-${INTCA}
 EOL
 #        cat > infra/docker/${STORAGE}/${VAULT_CLUSTER}/ssl/${i}.pem << EOL
 #${CRT}
@@ -216,7 +215,7 @@ EOL
         yapi ${@}
 ;;
 "logs")
-        docker logs ${VAULT_CLUSTER}_vault0$2_1  -f 2>&1 |grep -v checkpoint
+        docker logs ${VAULT_CLUSTER}-vault0$2  -f 2>&1 |grep -v checkpoint
 ;;
 
 "generate_root_recovery")

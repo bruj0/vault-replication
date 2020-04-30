@@ -2,7 +2,7 @@ storage "file" {
   path    = "/vault/raft"
 }
 listener "tcp" {
-  address = "primary_vault_pki_1:8200"
+  address = "primary-pki:8200"
   tls_disable = "true"
 telemetry {
   prometheus_retention_time = "30s"

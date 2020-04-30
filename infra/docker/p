@@ -26,11 +26,27 @@ typeset -a VAULT_dr_PORTS=("9401" "9402" "9403")
 echo "# Using storage: ${STORAGE}"
 case "$1" in
     "wipe")
-         sudo rm -fr infra/docker/storage/raft/${VAULT_CLUSTER}
-         mkdir -p infra/docker/storage/raft/${VAULT_CLUSTER}/{01,02,03,unsealer}
+        if [ ! -z "$2" ]; then
+             sudo rm -fr infra/docker/storage/raft/${VAULT_CLUSTER}/$2
+             mkdir -p infra/docker/storage/raft/${VAULT_CLUSTER}/$2
+        else
+             sudo rm -fr infra/docker/storage/raft/${VAULT_CLUSTER}
+            mkdir -p infra/docker/storage/raft/${VAULT_CLUSTER}/{01,02,03,unsealer,pki}
+        fi
+    ;;
+    "wipe_nodes")
+        sudo rm -fr infra/docker/storage/raft/${VAULT_CLUSTER}/{01,02,03}
+        mkdir -p infra/docker/storage/raft/${VAULT_CLUSTER}/{01,02,03}
     ;;
     "restart")
-        ${COMPOSE_CMD} restart vault01 vault02 vault03
+        if [ ! -z "$2" ]; then
+            ${COMPOSE_CMD} restart $2
+        else
+            ${COMPOSE_CMD} restart vault01 vault02 vault03
+        fi
+    ;;
+    "stop")
+        ${COMPOSE_CMD} stop $2
     ;;
     "down")
          ${COMPOSE_CMD} down

@@ -8,7 +8,7 @@ stages:
       headers:
         X-Vault-Token: "{env_vars.VAULT_TOKEN}"
       json:
-        common_name: "primary_vault01_1"
+        common_name: "primary-vault01"
         ttl": "720h"
     response:
       status_code: 200
@@ -24,7 +24,7 @@ stages:
       headers:
         X-Vault-Token: "{env_vars.VAULT_TOKEN}"
       json:
-        common_name: "primary_vault02_1"
+        common_name: "primary-vault02"
         ttl": "720h"
     response:
       status_code: 200
@@ -40,8 +40,7 @@ stages:
       headers:
         X-Vault-Token: "{env_vars.VAULT_TOKEN}"
       json:
-        common_name: "primary_vault03_1"
-        alt_names: "primary_vault03_1"
+        common_name: "primary-vault03"
         ttl": "720h"
     response:
       status_code: 200
@@ -57,7 +56,7 @@ stages:
       headers:
         X-Vault-Token: "{env_vars.VAULT_TOKEN}"
       json:
-        common_name: "primary_vault_unsealer_1"
+        common_name: "primary-unsealer"
         ip_sans: "127.0.0.1"
         ttl": "720h"
     response:

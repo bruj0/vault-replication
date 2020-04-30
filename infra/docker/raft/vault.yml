@@ -1,14 +1,13 @@
 version: "3"
 services:
   vault01: &vault_server
+    container_name: ${VAULT_CLUSTER}-vault01
     image: vault-prem:1.4.0
     environment:
       - VAULT_REDIRECT_INTERFACE=eth0
       - VAULT_TOKEN=autounseal
       #- VAULT_CACERT=/vault/config/ssl/ca.pem
-    entrypoint: /bin/sh
-    command: >
-      sh -c "cp  /vault/config/ssl/ca.pem /etc/ssl/certs/ && update-ca-certificates && vault server -config=/vault/config/vault01.hcl"
+    command: vault server -config=/vault/config/vault01.hcl
     #command: vault server -config=/vault/config/vault01.hcl
     volumes:
       - ./${VAULT_CLUSTER}:/vault/config
@@ -21,17 +20,16 @@ services:
       - vault_${VAULT_CLUSTER}C
   vault02:
     <<: *vault_server
+    container_name: ${VAULT_CLUSTER}-vault02
     depends_on:
       - vault_unsealer
-    #command: vault server -config=/vault/config/vault02.hcl
-    entrypoint: /bin/sh
-    command: >
-      sh -c "cp  /vault/config/ssl/ca.pem /etc/ssl/certs/ && update-ca-certificates && vault server -config=/vault/config/vault02.hcl"
+    command: vault server -config=/vault/config/vault02.hcl
     volumes:
       - ./${VAULT_CLUSTER}:/vault/config
       - ./../storage/raft/${VAULT_CLUSTER}/02:/vault/raft
   vault03:
     <<: *vault_server
+    container_name: ${VAULT_CLUSTER}-vault03
     depends_on:
       - vault_unsealer
     command: vault server -config=/vault/config/vault03.hcl
@@ -41,16 +39,15 @@ services:
   ## Unsealer
   vault_unsealer:
     <<: *vault_server
-    #command: vault server -config=/vault/config/vault_unsealer.hcl
-    entrypoint: /bin/sh
-    command: >
-      /bin/sh -c "cp  /vault/config/ssl/ca.pem /etc/ssl/certs/; update-ca-certificates; vault server -config=/vault/config/vault_unsealer.hcl"
+    container_name: ${VAULT_CLUSTER}-unsealer
+    command: vault server -config=/vault/config/vault_unsealer.hcl
     volumes:
       - ./${VAULT_CLUSTER}:/vault/config
       - ./../storage/raft/${VAULT_CLUSTER}/unsealer:/vault/raft
   ## PKI
   vault_pki: &vault_pki
     image: vault-prem:1.4.0
+    container_name: ${VAULT_CLUSTER}-pki
     environment:
       - VAULT_TOKEN=autounseal
       - VAULT_LOG_LEVEL=debug
