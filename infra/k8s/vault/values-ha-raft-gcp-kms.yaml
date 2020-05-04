@@ -1,0 +1,56 @@
+global:
+  enabled: true
+
+injector:
+  enabled: true
+  image:
+    tag: "0.3.0"
+  agentImage:
+    repository: eu.gcr.io/rodrigo-support/vault-prem
+    tag: "1.4.0"
+
+  logLevel: "debug"
+  authPath: "auth/kubernetes"
+
+server:
+  extraEnvironmentVars:
+    VAULT_LOG_LEVEL: "debug"
+    GOOGLE_CREDENTIALS: /vault/userconfig/kms-creds/credentials.json
+    GOOGLE_APPLICATION_CREDENTIALS: /vault/userconfig/kms-creds/credentials.json
+
+  image:
+    repository: eu.gcr.io/rodrigo-support/vault-prem
+    tag: "1.4.0"
+
+  extraVolumes:
+    - type: secret
+      name: kms-creds
+
+  auditStorage:
+    enabled: true
+  ha:
+    enabled: true
+    replicas: 3
+    raft:
+      enabled: true
+      config: |
+        seal "gcpckms" {
+          project     = "rodrigo-support"
+          region      = "global"
+          key_ring    = "vault"
+          crypto_key  = "vault-unsealer"
+        }
+        ui = true
+
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+        }
+
+        storage "raft" {
+          path = "/vault/data"
+        }
+
+        service_registration "kubernetes" {}
+    

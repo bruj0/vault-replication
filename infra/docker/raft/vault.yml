@@ -2,7 +2,7 @@ version: "3"
 services:
   vault01: &vault_server
     container_name: ${VAULT_CLUSTER}-vault01
-    image: vault-prem:1.4.0
+    image: vault-prem:1.4.0-2
     environment:
       - VAULT_REDIRECT_INTERFACE=eth0
       - VAULT_TOKEN=autounseal
@@ -46,7 +46,7 @@ services:
       - ./../storage/raft/${VAULT_CLUSTER}/unsealer:/vault/raft
   ## PKI
   vault_pki: &vault_pki
-    image: vault-prem:1.4.0
+    image: vault-prem:1.4.0-2
     container_name: ${VAULT_CLUSTER}-pki
     environment:
       - VAULT_TOKEN=autounseal

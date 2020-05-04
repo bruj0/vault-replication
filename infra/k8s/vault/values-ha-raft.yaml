@@ -1,0 +1,28 @@
+global:
+  enabled: true
+
+injector:
+  enabled: true
+  image:
+    tag: "0.3.0"
+  agentImage:
+    repository: eu.gcr.io/rodrigo-support/vault-prem
+    tag: "1.4.0"
+
+  logLevel: "debug"
+  authPath: "auth/kubernetes"
+
+server:
+  extraEnvironmentVars:
+    VAULT_LOG_LEVEL: "debug"
+  image:
+    repository: eu.gcr.io/rodrigo-support/vault-prem
+    tag: "1.4.0"
+
+  auditStorage:
+    enabled: true
+  ha:
+    enabled: true
+    replicas: 3
+    raft:
+      enabled: true

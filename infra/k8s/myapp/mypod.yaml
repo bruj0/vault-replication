@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mypod
+  namespace: myapp
+  labels:
+    app: mypod
+  annotations:
+    vault.hashicorp.com/agent-inject: "true"
+    vault.hashicorp.com/role: "internal-app"
+  #    vault.hashicorp.com/namespace: "dev-framework"
+    vault.hashicorp.com/agent-inject-secret-database-config.txt: "secret/data/database/config"
+    vault.hashicorp.com/agent-inject-template-database-config.txt: |
+      {{- with secret "secret/data/database/config" -}}
+      postgres://{{ .Data.data.username }}:{{ .Data.data.password }}@postgres:5432/mydb?sslmode=disable
+      {{- end }}    
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mypod
+  template:
+    metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "internal-app"
+      #    vault.hashicorp.com/namespace: "dev-framework"
+        vault.hashicorp.com/agent-inject-secret-database-config.txt: "secret/data/database/config"
+        vault.hashicorp.com/agent-inject-template-database-config.txt: |
+          {{- with secret "secret/data/database/config" -}}
+          postgres://{{ .Data.data.username }}:{{ .Data.data.password }}@postgres:5432/mydb?sslmode=disable
+          {{- end }}          
+      labels:
+        app: mypod
+    spec:
+      containers:
+        - name: mypod2
+          image: busybox
+          command:
+            - sleep
+            - "3600"
