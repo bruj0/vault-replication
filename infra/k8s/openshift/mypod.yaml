@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mypod
-  namespace: myapp
+  namespace: vaultapp
   labels:
     app: mypod
 spec:
@@ -14,7 +14,7 @@ spec:
     metadata:
       annotations:
         vault.hashicorp.com/agent-inject: "true"
-        vault.hashicorp.com/role: "internal-app-role"
+        vault.hashicorp.com/role: "myapp-role"
         vault.hashicorp.com/namespace: "myns_vault"
         vault.hashicorp.com/agent-inject-secret-database-config.txt: "secret/data/database/config"
         vault.hashicorp.com/agent-inject-template-database-config.txt: |
@@ -26,7 +26,7 @@ spec:
     spec:
       serviceAccountName: internal-app
       containers:
-        - name: mypod2
+        - name: mypod
           image: busybox
           command:
             - sleep

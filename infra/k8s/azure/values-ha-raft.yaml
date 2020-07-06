@@ -1,0 +1,125 @@
+global:
+  enabled: true
+
+injector:
+  enabled: true
+  image:
+    repository: "hashicorp/vault-k8s"
+    tag: "0.4.0"
+    pullPolicy: IfNotPresent
+  agentImage:
+    repository: vault.azurecr.io/vault
+    tag: "1.4.2_ent"
+  logLevel: "debug"
+  authPath: "auth/kubernetes"
+
+server:
+  extraEnvironmentVars:
+    VAULT_LOG_LEVEL: "debug"
+  image:
+    repository: vault.azurecr.io/vault
+    tag: "1.4.2_ent"
+
+  ha:
+    enabled: true
+    replicas: 3
+    raft:
+      enabled: true
+      # Set the Node Raft ID to the name of the pod
+      setNodeId: true
+
+      # Note: Configuration files are stored in ConfigMaps so sensitive data
+      # such as passwords should be either mounted through extraSecretEnvironmentVars
+      # or through a Kube secret.  For more information see:
+      # https://www.vaultproject.io/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
+      config: |
+        ui = true
+
+        listener "tcp" {
+          tls_disable = 1
+          address = "[::]:8200"
+          cluster_address = "[::]:8201"
+        }
+
+        storage "raft" {
+          path = "/vault/data"
+        }
+        service_registration "kubernetes" {}
+
+        replication {
+          resolver_discover_servers = false
+        }
+  ingress:
+    enabled: true
+    labels:
+      {}
+      # traffic: external
+    annotations:
+      {}
+      # |
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+      #   or
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: vault-aks.b0x.dev
+        paths: []
+
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+  authDelegator:
+    enabled: true
+
+  # Affinity Settings
+  # Commenting out or setting as empty the affinity variable, will allow
+  # deployment to single node services such as Minikube
+  affinity: |
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: {{ template "vault.name" . }}
+              app.kubernetes.io/instance: "{{ .Release.Name }}"
+              component: server
+          topologyKey: kubernetes.io/hostname
+
+  # Enables a headless service to be used by the Vault Statefulset
+  service:
+    #This creates a public load balancer in AKS
+    type: LoadBalancer
+    enabled: true
+    # Port on which Vault server is listening
+    port: 8200
+    # Target port to which the service should be mapped to
+    targetPort: 8200
+    # Extra annotations for the service definition. This can either be YAML or a
+    # YAML-formatted multi-line templated string map of the annotations to apply
+    # to the service.
+    annotations: {}
+
+  # This configures the Vault Statefulset to create a PVC for data
+  # storage when using the file or raft backend storage engines.
+  # See https://www.vaultproject.io/docs/configuration/storage/index.html to know more
+  dataStorage:
+    enabled: true
+    # Size of the PVC created
+    size: 10Gi
+    # Name of the storage class to use.  If null it will use the
+    # configured default Storage Class.
+    storageClass: null
+    # Access Mode of the storage device being used for the PVC
+    accessMode: ReadWriteOnce
+
+  auditStorage:
+    enabled: false
+    # Size of the PVC created
+    size: 10Gi
+    # Name of the storage class to use.  If null it will use the
+    # configured default Storage Class.
+    storageClass: null
+    # Access Mode of the storage device being used for the PVC
+    accessMode: ReadWriteOnce
